@@ -24,7 +24,7 @@ class Filter
     public function __construct(Builder $query, array $inputs = [])
     {
         $this->query = $query;
-        $this->options = array_merge(config('apifiltering.default'), $inputs);
+        $this->options = array_merge(config('apifiltering.default', []), $inputs);
     }
 
     /**
