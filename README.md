@@ -8,7 +8,7 @@ This package regroups the [Server Side](https://github.com/Ifnot/api-filtering/w
 
 Actually there is one specification :
 
-* AFS1 (Api Filtering Specification 1) : Define the supported http parameters for filtering resources.
+* [AFS1 (Api Filtering Specification 1)](https://github.com/Ifnot/api-filtering/blob/master/AFS1.md) : Define the supported http parameters for filtering resources.
 
 ## Installation
 
