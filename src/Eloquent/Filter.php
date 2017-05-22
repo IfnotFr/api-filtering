@@ -50,11 +50,38 @@ class Filter
     protected function handleWhere($query)
     {
         if (! empty($this->options['where'])) {
-            foreach ($this->options['where'] as $column => $details) {
-                foreach ($details as $operator => $value) {
+            foreach ($this->options['where'] as $column => $condition) {
+                $query = $this->handleWhereCondition($query, $column, $condition);
+            }
+        }
+
+        return $query;
+    }
+
+    protected function handleWhereCondition($query, $column, $condition)
+    {
+        // If there is a specified operator
+        if(is_array($condition)) {
+            foreach ($condition as $operator => $value) {
+                $operator = strtolower($operator);
+
+                if($operator == 'in') {
+                    $query->whereIn($column, explode(',', $value));
+                }
+                elseif($operator == 'not in') {
+                    $query->whereNotIn($column, explode(',', $value));
+                }
+                elseif($operator == 'between') {
+                    $query->whereBetween($column, explode(',', $value));
+                }
+                else {
                     $query->where($column, $operator, $value);
                 }
             }
+        }
+        // If there is no operator, assign the value with the equal operator
+        else {
+            $query->where($column, '=', $condition);
         }
 
         return $query;
@@ -84,7 +111,7 @@ class Filter
     protected function handleLimit(Builder $query)
     {
         if (! empty($this->options['limit'])) {
-            $query->limit($this->options['limit']);
+            $query->limit((int) $this->options['limit']);
         }
 
         return $query;
@@ -98,7 +125,7 @@ class Filter
     protected function handleOffset(Builder $query)
     {
         if (! empty($this->options['offset'])) {
-            $query->offset($this->options['offset']);
+            $query->offset((int) $this->options['offset']);
         }
 
         return $query;
