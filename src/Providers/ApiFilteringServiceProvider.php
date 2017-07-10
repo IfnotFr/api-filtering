@@ -4,7 +4,7 @@ namespace Ifnot\ApiFiltering\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class ApiFilteringServiceProdiver extends ServiceProvider
+class ApiFilteringServiceProvider extends ServiceProvider
 {
     /**
      * Indicates if loading of the provider is deferred.
