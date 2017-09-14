@@ -24,7 +24,20 @@ class Filter
     public function __construct(Builder $query, array $inputs = [])
     {
         $this->query = $query;
+
+        $inputs = $this->parseInputJson($inputs);
         $this->options = array_merge(config('apifiltering.default', []), $inputs);
+    }
+
+    protected function parseInputJson($inputs)
+    {
+        foreach($inputs as $name => $content) {
+            if(is_string($content)) {
+                $inputs[$name] = json_decode($content, true);
+            }
+        }
+
+        return $inputs;
     }
 
     /**
