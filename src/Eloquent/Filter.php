@@ -102,7 +102,11 @@ class Filter
         }
         // If there is no operator, assign the value with the equal operator
         else {
-            $query->where($column, '=', $condition);
+            if($condition == 'null') {
+                $query->whereNull($column);
+            } else {
+                $query->where($column, '=', $condition);
+            }
         }
 
         return $query;
