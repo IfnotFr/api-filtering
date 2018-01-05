@@ -27,6 +27,7 @@ The following operators MUST be implemented : `=`, `<`, `>`, `<=`, `>=`, `<>`, `
   * Example : `?where[column_1][in]=value_1,value_2,value_3`
 * The `between` operator SHOULD have two comma separated values.
   * Example : `?where[column_1][between]=1,3`
+* The `=` and `!=` operators MAY be used `null` values for processing `WHERE NULL` and `WHERE NOT NULL` operations.
 
 ## 2. OrderBy
 
