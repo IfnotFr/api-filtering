@@ -88,7 +88,15 @@ class Filter
                     $query->whereBetween($column, explode(',', $value));
                 }
                 else {
-                    $query->where($column, $operator, $value);
+                    if($value == 'null') {
+                        if($operator == '=') {
+                            $query->whereNull($column);
+                        } elseif($operator == '!=') {
+                            $query->whereNotNull($column);
+                        }
+                    } else {
+                        $query->where($column, $operator, $value);
+                    }
                 }
             }
         }
