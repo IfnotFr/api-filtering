@@ -32,8 +32,8 @@ class Filter
 
     protected function parseInputJson($inputs)
     {
-        foreach($inputs as $name => $content) {
-            if(is_string($content)) {
+        foreach ($inputs as $name => $content) {
+            if (is_string($content)) {
                 $inputs[$name] = json_decode($content, true);
             }
         }
@@ -43,9 +43,9 @@ class Filter
 
     protected function castValue($value)
     {
-        foreach($this->casting as $casting) {
+        foreach ($this->casting as $casting) {
             list($search, $replace) = $casting;
-            if($value === $search) {
+            if ($value === $search) {
                 $value = $replace;
             }
         }
@@ -87,26 +87,23 @@ class Filter
     protected function handleWhereCondition($query, $column, $condition)
     {
         // If there is a specified operator
-        if(is_array($condition)) {
+        if (is_array($condition)) {
             foreach ($condition as $operator => $value) {
                 $value = $this->castValue($value);
 
                 $operator = strtolower($operator);
 
-                if($operator == 'in') {
+                if ($operator == 'in') {
                     $query->whereIn($column, explode(',', $value));
-                }
-                elseif($operator == 'not in') {
+                } elseif ($operator == 'not in') {
                     $query->whereNotIn($column, explode(',', $value));
-                }
-                elseif($operator == 'between') {
+                } elseif ($operator == 'between') {
                     $query->whereBetween($column, explode(',', $value));
-                }
-                else {
-                    if(is_null($value)) {
-                        if($operator == '=') {
+                } else {
+                    if (is_null($value)) {
+                        if ($operator == '=') {
                             $query->whereNull($column);
-                        } elseif($operator == '!=') {
+                        } elseif ($operator == '!=') {
                             $query->whereNotNull($column);
                         }
                     } else {
@@ -114,10 +111,9 @@ class Filter
                     }
                 }
             }
-        }
-        // If there is no operator, assign the value with the equal operator
+        } // If there is no operator, assign the value with the equal operator
         else {
-            if(is_null($condition)) {
+            if (is_null($condition)) {
                 $query->whereNull($column);
             } else {
                 $query->where($column, '=', $condition);
