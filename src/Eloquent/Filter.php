@@ -27,6 +27,7 @@ class Filter
 
         $inputs = $this->parseInputJson($inputs);
         $this->options = array_merge(config('apifiltering.default', []), $inputs);
+        $this->casting = config('apifiltering.casting', []);
     }
 
     protected function parseInputJson($inputs)
@@ -38,6 +39,18 @@ class Filter
         }
 
         return $inputs;
+    }
+
+    protected function castValue($value)
+    {
+        foreach($this->casting as $casting) {
+            list($search, $replace) = $casting;
+            if($value === $search) {
+                $value = $replace;
+            }
+        }
+
+        return $value;
     }
 
     /**
@@ -76,6 +89,8 @@ class Filter
         // If there is a specified operator
         if(is_array($condition)) {
             foreach ($condition as $operator => $value) {
+                $value = $this->castValue($value);
+
                 $operator = strtolower($operator);
 
                 if($operator == 'in') {
@@ -88,7 +103,7 @@ class Filter
                     $query->whereBetween($column, explode(',', $value));
                 }
                 else {
-                    if($value == 'null') {
+                    if(is_null($value)) {
                         if($operator == '=') {
                             $query->whereNull($column);
                         } elseif($operator == '!=') {
@@ -102,7 +117,7 @@ class Filter
         }
         // If there is no operator, assign the value with the equal operator
         else {
-            if($condition == 'null') {
+            if(is_null($condition)) {
                 $query->whereNull($column);
             } else {
                 $query->where($column, '=', $condition);
