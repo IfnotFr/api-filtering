@@ -61,6 +61,7 @@ class Filter
         $query = $this->query;
 
         $query = $this->handleWhere($query);
+        $query = $this->handleHaving($query);
         $query = $this->handleOrder($query);
         $query = $this->handleLimit($query);
         $query = $this->handleOffset($query);
@@ -77,14 +78,30 @@ class Filter
     {
         if (! empty($this->options['where'])) {
             foreach ($this->options['where'] as $column => $condition) {
-                $query = $this->handleWhereCondition($query, $column, $condition);
+                $query = $this->handleWhereOrHavingCondition($query, $column, $condition, 'where');
             }
         }
 
         return $query;
     }
 
-    protected function handleWhereCondition($query, $column, $condition)
+    /**
+     * @param $query
+     *
+     * @return Builder
+     */
+    protected function handleHaving($query)
+    {
+        if (! empty($this->options['having'])) {
+            foreach ($this->options['having'] as $column => $condition) {
+                $query = $this->handleWhereOrHavingCondition($query, $column, $condition, 'having');
+            }
+        }
+
+        return $query;
+    }
+
+    protected function handleWhereOrHavingCondition($query, $column, $condition, $type = 'where')
     {
         // If there is a specified operator
         if (is_array($condition)) {
@@ -94,29 +111,29 @@ class Filter
                 $operator = strtolower($operator);
 
                 if ($operator == 'in') {
-                    $query->whereIn($column, explode(',', $value));
+                    $query->{$type . 'In'}($column, explode(',', $value));
                 } elseif ($operator == 'not in') {
-                    $query->whereNotIn($column, explode(',', $value));
+                    $query->{$type . 'NotIn'}($column, explode(',', $value));
                 } elseif ($operator == 'between') {
-                    $query->whereBetween($column, explode(',', $value));
+                    $query->{$type . 'Between'}($column, explode(',', $value));
                 } else {
                     if (is_null($value)) {
                         if ($operator == '=') {
-                            $query->whereNull($column);
+                            $query->{$type . 'Null'}($column);
                         } elseif ($operator == '!=') {
-                            $query->whereNotNull($column);
+                            $query->{$type . 'NotNull'}($column);
                         }
                     } else {
-                        $query->where($column, $operator, $value);
+                        $query->{$type}($column, $operator, $value);
                     }
                 }
             }
         } // If there is no operator, assign the value with the equal operator
         else {
             if (is_null($condition)) {
-                $query->whereNull($column);
+                $query->{$type . 'Null'}($column);
             } else {
-                $query->where($column, '=', $condition);
+                $query->{$type}($column, '=', $condition);
             }
         }
 
