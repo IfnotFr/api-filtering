@@ -10,8 +10,8 @@ use Ifnot\ApiFiltering\Eloquent\Filter;
  */
 trait CanBeFiltered
 {
-    public function scopeFilter($query, $inputs = [])
+    public function scopeFilter($query, $inputs = [], $columnConditions = [])
     {
-        return (new Filter($query, $inputs))->handle();
+        return (new Filter($query, $inputs, $columnConditions))->handle();
     }
 }

@@ -15,18 +15,21 @@ class Filter
 
     protected $options = [];
 
+    protected $config = [];
+
     /**
      * Collection constructor.
      *
      * @param Builder $query
      * @param array $inputs
      */
-    public function __construct(Builder $query, array $inputs = [])
+    public function __construct(Builder $query, array $inputs = [], $config = [])
     {
         $this->query = $query;
 
         $inputs = $this->parseInputJson($inputs);
         $this->options = array_merge(config('apifiltering.default', []), $inputs);
+        $this->config = $config;
         $this->casting = config('apifiltering.casting', []);
     }
 
@@ -103,6 +106,26 @@ class Filter
 
     protected function handleWhereOrHavingCondition($query, $column, $condition, $type = 'where')
     {
+        if(isset($this->config['prefix'])) {
+            $column = $this->config['prefix'] . '.' . $column;
+        }
+
+        // Searching for a custom condition handler for this column
+        if(isset($this->config['columns'])) {
+            foreach($this->config['columns'] as $columnTest => $handler) {
+                if (fnmatch($columnTest, $column)) {
+                    if (is_array($condition)) {
+                        foreach ($condition as $operator => $value) {
+                            $handler($query, $column, $operator, $value, $type);
+                        }
+                    } else {
+                        $handler($query, $column, '=', $condition, $type);
+                    }
+                    return $query;
+                }
+            }
+        }
+
         // If there is a specified operator
         if (is_array($condition)) {
             foreach ($condition as $operator => $value) {
