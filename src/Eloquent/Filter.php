@@ -153,6 +153,8 @@ class Filter
             }
         } // If there is no operator, assign the value with the equal operator
         else {
+            $condition = $this->castValue($condition);
+            
             if (is_null($condition)) {
                 $query->{$type . 'Null'}($column);
             } else {
